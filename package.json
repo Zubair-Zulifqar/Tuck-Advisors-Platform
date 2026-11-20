@@ -1,0 +1,29 @@
+{
+  "name": "tuck-advisors-platform",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Tuck Advisors \u2014 AI-powered M&A advisory platform, CRM automation engine and Chrome deal workstation.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "npm run dev -w @tuck/web",
+    "build": "npm run build -w @tuck/web && npm run build -w @tuck/extension",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:py": "cd services/ai-research && .venv/bin/python -m pytest -q",
+    "test:e2e": "npm run test:e2e -w @tuck/web",
+    "db:migrate": "npm run migrate -w @tuck/db",
+    "db:seed": "npm run seed -w @tuck/db",
+    "scan:secrets": "node scripts/scan-secrets.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.9",
+    "@types/node": "^22.10.0"
+  }
+}
