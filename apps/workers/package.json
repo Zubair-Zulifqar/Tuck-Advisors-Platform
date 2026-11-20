@@ -1,0 +1,14 @@
+{
+  "name": "@tuck/workers",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "once": "tsx src/index.ts --once",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": { "@tuck/db": "*", "@tuck/engine": "*", "@tuck/integrations": "*" },
+  "devDependencies": { "tsx": "^4.19.2" }
+}
