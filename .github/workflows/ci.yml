@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Secret scan
+        run: node scripts/scan-secrets.mjs
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit & integration tests (vitest, all workspaces)
+        run: npm test
+      - name: Build web app
+        run: npm run build -w @tuck/web
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+      - name: Build Chrome extension
+        run: npm run package -w @tuck/extension
+        env:
+          NODE_ENV: production
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chrome-extension
+          path: apps/extension/dist/tuck-advisors-extension.zip
+
+  python:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/ai-research
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - run: python -m pytest -q

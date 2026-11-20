@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Tuck Advisors Fit Score service (services/ai-research) as an AWS Lambda behind an HTTP API.
+
+Parameters:
+  ScoringServiceToken:
+    Type: String
+    NoEcho: true
+    Description: Shared bearer token (same value as SCORING_SERVICE_TOKEN in the web app).
+
+Globals:
+  Function:
+    Timeout: 15
+    MemorySize: 512
+    Runtime: python3.12
+    Architectures: [arm64]
+
+Resources:
+  ScoringFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../../../services/ai-research/
+      Handler: tuck_scoring.lambda_handler.handler
+      Environment:
+        Variables:
+          SCORING_SERVICE_TOKEN: !Ref ScoringServiceToken
+      Events:
+        Health: { Type: HttpApi, Properties: { Path: /health, Method: GET } }
+        Score: { Type: HttpApi, Properties: { Path: /v1/score, Method: POST } }
+        Classify: { Type: HttpApi, Properties: { Path: /v1/classify-buyer, Method: POST } }
+
+Outputs:
+  ScoringServiceUrl:
+    Description: Set SCORING_SERVICE_URL in the web app to this value.
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com"

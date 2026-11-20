@@ -1,0 +1,53 @@
+# Local/full-stack environment: Postgres + scoring service + web + worker.
+#   cp .env.example .env   # fill SESSION_SECRET etc.
+#   docker compose -f infrastructure/docker-compose.yml up --build
+name: tuck-advisors
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: tuck
+      POSTGRES_PASSWORD: tuck-local-only
+      POSTGRES_DB: tuck
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tuck -d tuck"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  scoring:
+    build: { context: ../services/ai-research, dockerfile: Dockerfile }
+    env_file: ../.env
+    environment:
+      PORT: "8000"
+      DATABASE_URL: postgres://tuck:tuck-local-only@postgres:5432/tuck
+    ports: ["8088:8000"]
+    depends_on: { postgres: { condition: service_healthy } }
+
+  web:
+    build: { context: .., dockerfile: infrastructure/web.Dockerfile }
+    env_file: ../.env
+    environment:
+      DATABASE_URL: postgres://tuck:tuck-local-only@postgres:5432/tuck
+      AUTO_MIGRATE: "true"
+      SCORING_SERVICE_URL: http://scoring:8000
+      APP_URL: http://localhost:3000
+    ports: ["3000:3000"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      scoring: { condition: service_started }
+
+  worker:
+    build: { context: .., dockerfile: infrastructure/worker.Dockerfile }
+    env_file: ../.env
+    environment:
+      DATABASE_URL: postgres://tuck:tuck-local-only@postgres:5432/tuck
+      SCORING_SERVICE_URL: http://scoring:8000
+    depends_on:
+      postgres: { condition: service_healthy }
+      web: { condition: service_healthy }
+
+volumes:
+  pgdata:
