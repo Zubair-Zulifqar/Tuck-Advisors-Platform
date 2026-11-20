@@ -1,0 +1,14 @@
+{
+  "name": "@tuck/extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "package": "node build.mjs --zip",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": { "@tuck/shared": "*", "zod": "^3.23.8" },
+  "devDependencies": { "@types/chrome": "^0.0.287", "esbuild": "^0.24.2", "jsdom": "^25.0.1" }
+}

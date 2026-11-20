@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tuck Advisors</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="mark" aria-hidden="true">T</span>
+        <span class="brand-name">Tuck Advisors</span>
+      </div>
+      <div class="topbar-actions">
+        <span id="connection" class="connection" aria-live="polite"></span>
+        <button id="refresh" type="button" class="icon-btn" title="Re-read this page" aria-label="Re-read this page">↻</button>
+        <button id="sign-out" type="button" class="btn btn-ghost btn-sm" hidden>Sign out</button>
+      </div>
+    </header>
+    <main id="view" class="view"><p class="status status-loading">Loading…</p></main>
+    <footer class="foot">Only information visible on the current page is used. Nothing is sent without your action.</footer>
+    <script src="sidepanel.js" type="module"></script>
+  </body>
+</html>
